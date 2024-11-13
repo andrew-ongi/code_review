@@ -3,6 +3,8 @@
 import { Command } from 'commander';
 import OpenAI from 'openai';
 import axios from 'axios'
+import chalk from "chalk";
+import figlet from "figlet";
 import 'dotenv/config';
 
 let GITHUB_TOKEN = process.env.GITHUB_TOKEN;
@@ -144,6 +146,18 @@ program
 
     openai = new OpenAI(
       { apiKey: OPENAI_API_KEY }
+    );
+
+    console.log(
+      chalk.blue(
+        figlet.textSync('pr-code-review', { horizontalLayout: 'full' })
+      )
+    );
+    const version = require(path.resolve(__dirname, "../../package.json")).version;
+    console.log(
+      chalk.blue(
+        figlet.textSync('v'+ version)
+      )
     );
 
     console.log('options', options);
