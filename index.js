@@ -3,9 +3,22 @@
 import { Command } from 'commander';
 import OpenAI from 'openai';
 import axios from 'axios'
-import chalk from "chalk";
-import figlet from "figlet";
+import chalk from 'chalk';
+import figlet from 'figlet';
+import path from 'path';
 import 'dotenv/config';
+import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+function getVersion() {
+  const packageJsonPath = path.join(__dirname, 'package.json');
+  const packageData = readFileSync(packageJsonPath, 'utf-8');
+  const { version } = JSON.parse(packageData);
+  return version;
+}
 
 let GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 let GITHUB_OWNER = process.env.GITHUB_OWNER;
@@ -125,11 +138,14 @@ async function main(pullRequestId, repo) {
     return;
   }
 
-  console.log(`${green}Analyzing code changes...`);
-  const analysis = await commentCode(diff);
+  console.log(`Analyzing code changes...`);
+  const codeReview = await commentCode(diff);
+  console.log(`\nCode Review Result:\n`, codeReview);
+  await postPullRequestComment(GITHUB_OWNER, repo, pullRequestId, codeReview);
 
-  console.log(`\n${cyan}Analysis Result:\n`, analysis);
-  await postPullRequestComment(GITHUB_OWNER, repo, pullRequestId, analysis);
+  const codeComment = await commentCode(diff);
+  console.log(`\nCode comment:\n`, codeComment);
+  await postPullRequestComment(GITHUB_OWNER, repo, pullRequestId, codeComment);
 }
 
 program
@@ -139,25 +155,22 @@ program
   .option('--github-owner <string>', 'Github owner')
   .option('--github-token <string>', 'Github token')
   .action(async (options) => {
-    const { pullRequestId, repo, openaiApiKey, githubToken } = options;
+    console.log(
+      chalk.blue(
+        figlet.textSync('pr code review', { horizontalLayout: 'full' })
+      )
+    );
+    console.log(
+      chalk.yellow('VERSION: ', getVersion())
+    );
+
+    const { pullRequestId, repo, openaiApiKey, githubToken, githubOwner } = options;
     GITHUB_TOKEN = githubToken || process.env.GITHUB_TOKEN;
     OPENAI_API_KEY = openaiApiKey || process.env.OPENAI_API_KEY;
     GITHUB_OWNER = githubOwner || process.env.GITHUB_OWNER;
 
     openai = new OpenAI(
       { apiKey: OPENAI_API_KEY }
-    );
-
-    console.log(
-      chalk.blue(
-        figlet.textSync('pr-code-review', { horizontalLayout: 'full' })
-      )
-    );
-    const version = require(path.resolve(__dirname, "../../package.json")).version;
-    console.log(
-      chalk.blue(
-        figlet.textSync('v'+ version)
-      )
     );
 
     console.log('options', options);
