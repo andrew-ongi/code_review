@@ -139,7 +139,7 @@ async function main(pullRequestId, repo) {
   }
 
   console.log(`Analyzing code changes...`);
-  const codeReview = await commentCode(diff);
+  const codeReview = await analyzeCode(diff);
   console.log(`\nCode Review Result:\n`, codeReview);
   await postPullRequestComment(GITHUB_OWNER, repo, pullRequestId, codeReview);
 
