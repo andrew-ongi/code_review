@@ -29,9 +29,8 @@ const program = new Command();
 let openai;
 
 async function getPullRequestDiff(owner, repo, pullNumber) {
-  console.log('GITHUB_TOKEN', GITHUB_TOKEN);
   try {
-    const url = `https://api.github.com/repos/${GITHUB_OWNER}/${repo}/pulls/${pullNumber}`;
+    const url = `https://api.github.com/repos/${owner}/${repo}/pulls/${pullNumber}`;
     console.log('url', url);
     const response = await axios.get(url, {
       headers: {
