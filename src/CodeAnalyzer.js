@@ -10,8 +10,9 @@ export default class CodeAnalyzer {
 
       ${diff}
       
-      Lakukan *code review* dan berikan feedback, termasuk saran perbaikan performa, keamanan, dan *best practices*, dengan menyebutkan lokasi file, nama function, potongan code yang dimaksud, dan saran/contoh perubahan code (berikan juga highlight apa yang perlu diubah jika ada), dalam bahasa inggris.
+      Lakukan code review dan berikan feedback, termasuk saran perbaikan performa, keamanan, dan best practices, dengan menyebutkan lokasi file, nama function, potongan code yang dimaksud, dan saran/contoh perubahan code (berikan juga highlight apa yang perlu diubah jika ada). Jabarkan dalam bahasa inggris.
       Sebutkan dalam point-point: functionnya, code existing, feedback, dan suggestion dan potongan code yang disarankan
+      Periksa konteks secara keseluruhan
     `;
     const model = 'gpt-4o-mini';
     const temperature = 0.3;
@@ -25,7 +26,7 @@ export default class CodeAnalyzer {
 
       ${diff}
 
-      Tolong buat ringkasan perubahan dalam bentuk tabel dengan kolom: File changes | Summary. Summary dalam bentuk point-point, dan file changes cukup nama file saja, tidak perlu fullpath, dan dalam bahasa inggris
+      Tolong buat ringkasan perubahan dalam bentuk tabel dengan kolom: File changes | Summary. Summary dalam bentuk point-point, dan file changes cukup nama file saja, tidak perlu fullpath. for each modified file, provide a one-line summary followed by a detailed bullet point list of the changes. Jabarkan dalam bahasa inggris.
     `;
     const model = 'gpt-4o-mini';
     const temperature = 0.2;
@@ -39,7 +40,7 @@ export default class CodeAnalyzer {
 
       ${diff}
 
-      1. Tambahkan code comment ke function yang belum memiliki code comment (javadoc, jsdoc, etc tergantung techstack)
+      1. Tambahkan code comment ke function yang belum memiliki code comment (javadoc, jsdoc, etc tergantung techstack). Hanya tambahkan jika belum ada code comment dari code tersebut. Jabarkan dalam bahasa inggris.
     `;
     const model = 'gpt-4o-mini';
     const temperature = 0.2;
