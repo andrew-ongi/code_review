@@ -11,9 +11,10 @@ export default class CodeAnalyzer {
       ${diff}
       
       Lakukan *code review* dan berikan feedback, termasuk saran perbaikan performa, keamanan, dan *best practices*, dengan menyebutkan lokasi file, nama function, potongan code yang dimaksud, dan saran/contoh perubahan code (berikan juga highlight apa yang perlu diubah jika ada), dalam bahasa inggris.
+      Sebutkan dalam point-point: functionnya, code existing, feedback, dan suggestion dan potongan code yang disarankan
     `;
     const model = 'gpt-4o-mini';
-    const temperature = 0.4;
+    const temperature = 0.3;
     const response = await this.openAIService.chatCompletion(model, temperature, prompt);
     await this.githubService.postPullRequestComment(repo, pullRequestId, response);
   }
@@ -38,7 +39,7 @@ export default class CodeAnalyzer {
 
       ${diff}
 
-      1. Tambahkan code comment, berupa js-doc atau javadoc, atau sejenis tergantung bahasa pemrograman yang dipakai, dalam bahasa inggris, untuk function yang ditemukan. abaikan jika tidak ada function yang ditemukan. berikan apresiasi singkat kalau comment sudah ada. dalam bahasa inggris
+      1. Tambahkan code comment ke function yang belum memiliki code comment (javadoc, jsdoc, etc tergantung techstack)
     `;
     const model = 'gpt-4o-mini';
     const temperature = 0.2;
