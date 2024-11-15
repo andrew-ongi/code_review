@@ -6,13 +6,35 @@ export default class CodeAnalyzer {
 
   async analyzeCode(diff, repo, pullRequestId) {
     const prompt = `
-      Berikut adalah perubahan kode dari Pull Request:
+      As an AI code reviewer, your role is to analyze the changes in a Merge Request (MR) within a software development project. You will provide feedback on potential bugs and critical issues. The changes in the MR are provided in the standard git diff (unified diff) format. 
 
+      Your responsibilities include:          
+        - Analyzing only the lines of code that have been added, edited, or deleted in the MR. For example, in a git diff, these would be the lines starting with a '+' or '-'.
+        \`\`\`diff
+        - old line of code
+        + new line of code
+        \`\`\`
+        - Ignoring any code that hasn't been modified. In a git diff, these would be the lines starting with a ' ' (space).
+        \`\`\`diff
+            unchanged line of code
+        \`\`\`
+        - Avoiding repetition in your reviews if the line of code is correct. For example, if the same line of code appears multiple times in the diff, you should only comment on it once.
+        - Overlooking the absence of a new line at the end of all files. This is typically represented in a git diff as '\ No newline at end of file'.
+        - Using bullet points for clarity if you have multiple comments.
+        \`\`\`markdown
+        - Comment 1
+        - Comment 2
+        \`\`\`
+        - Leveraging Markdown to format your feedback effectively. For example, you can use backticks to format code snippets.
+        \`\`\`markdown
+        \`code snippet\`
+        \`\`\`
+        - Writing 'EMPTY_CODE_REVIEW' if there are no bugs or critical issues identified.
+        - Refraining from writing 'EMPTY_CODE_REVIEW' if there are bugs or critical issues.
+
+        State in bullet points: function name, existing code, feedback, and suggestion along with the recommended code snippet.
+      Here are the code changes:
       ${diff}
-      
-      Lakukan code review dan berikan feedback, termasuk saran perbaikan performa, keamanan, dan best practices, dengan menyebutkan lokasi file, nama function, potongan code yang dimaksud, dan saran/contoh perubahan code (berikan juga highlight apa yang perlu diubah jika ada). Jabarkan dalam bahasa inggris.
-      Sebutkan dalam point-point: functionnya, code existing, feedback, dan suggestion dan potongan code yang disarankan
-      Periksa konteks secara keseluruhan
     `;
     const model = 'gpt-4o-mini';
     const temperature = 0.3;
@@ -22,11 +44,17 @@ export default class CodeAnalyzer {
 
   async addCodeSummary(diff, repo, pullRequestId) {
     const prompt = `
-      Berikut adalah perubahan kode dari Pull Request:
-
-      ${diff}
-
-      Tolong buat ringkasan perubahan dalam bentuk tabel dengan kolom: File changes | Summary. Summary dalam bentuk point-point, dan file changes cukup nama file saja, tidak perlu fullpath. for each modified file, provide a one-line summary followed by a detailed bullet point list of the changes. Jabarkan dalam bahasa inggris.
+      Please create a summary of changes in the form of a table with the columns: File Changes | Summary. The Summary should be in bullet points, and File Changes should only include the file name (no full path). For each modified file, provide a one-line summary followed by a detailed bullet point list of the changes.
+      Use bullet points for clarity if you have multiple comments.
+        \`\`\`markdown
+        - Comment 1
+        - Comment 2
+        \`\`\`
+        - Leveraging Markdown to format your feedback effectively. For example, you can use backticks to format code snippets.
+        \`\`\`markdown
+        \`code snippet\`
+        \`\`\`
+      ${diff}      
     `;
     const model = 'gpt-4o-mini';
     const temperature = 0.2;
@@ -36,11 +64,9 @@ export default class CodeAnalyzer {
 
   async addCodeComments(diff, repo, pullRequestId) {
     const prompt = `
-      Berikut adalah perubahan kode dari Pull Request:
+      Add code comments to functions that do not already have them (e.g., Javadoc, JSDoc, etc., depending on the tech stack). Only add comments if they are missing for that code.
 
       ${diff}
-
-      1. Tambahkan code comment ke function yang belum memiliki code comment (javadoc, jsdoc, etc tergantung techstack). Hanya tambahkan jika belum ada code comment dari code tersebut. Jabarkan dalam bahasa inggris.
     `;
     const model = 'gpt-4o-mini';
     const temperature = 0.2;
