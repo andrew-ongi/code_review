@@ -6,7 +6,10 @@ export default class CodeAnalyzer {
 
   async analyzeCode(diff, repo, pullRequestId) {
     const prompt = `
-      As an AI code reviewer, your role is to analyze the changes in a Merge Request (MR) within a software development project. You will provide feedback on potential bugs and critical issues. The changes in the MR are provided in the standard git diff (unified diff) format. 
+      As an AI code reviewer, your role is to analyze the changes in a Merge Request (MR) within a software development project. 
+      You will provide feedback: including potential bugs and critical issues, security and performance, and best practice. 
+      You need to consider the overall context of the file changes before conducting a review.
+      The changes in the MR are provided in the standard git diff (unified diff) format. 
 
       Your responsibilities include:          
         - Analyzing only the lines of code that have been added, edited, or deleted in the MR. For example, in a git diff, these would be the lines starting with a '+' or '-'.
@@ -32,7 +35,7 @@ export default class CodeAnalyzer {
         - Writing 'EMPTY_CODE_REVIEW' if there are no bugs or critical issues identified.
         - Refraining from writing 'EMPTY_CODE_REVIEW' if there are bugs or critical issues.
 
-        State in bullet points: function name, existing code, feedback, and suggestion along with the recommended code snippet.
+        State in number point: function name, then followed by bullet points: existing code snippet, feedback, and suggestion along with the recommended code snippet.
       Here are the code changes:
       ${diff}
     `;
@@ -44,8 +47,10 @@ export default class CodeAnalyzer {
 
   async addCodeSummary(diff, repo, pullRequestId) {
     const prompt = `
-      Please create a summary of changes in the form of a table with the columns: File Changes | Summary. The Summary should be in bullet points, and File Changes should only include the file name (no full path). For each modified file, provide a one-line summary followed by a detailed bullet point list of the changes.
-      Use bullet points for clarity if you have multiple comments.
+      Please create a summary of changes in the form of a table with the columns: File Changes | Summary. 
+      File Changes should only include the file name (no full path). 
+      For each file changes, provide a summary (up to 3-5 sentences) followed by a detailed bullet point list of the changes.
+      Use bullet points for clarity if you have multiple comments in the Summary column (in collapsible format in next row):
         \`\`\`markdown
         - Comment 1
         - Comment 2

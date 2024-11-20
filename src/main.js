@@ -11,6 +11,11 @@ import { getVersion } from './utils.js';
 const program = new Command();
 
 program
+  .name('PR Review AI')
+  .description('PR Reviewer using openAI')
+  .version(getVersion());
+
+program
   .requiredOption('--pull-request-id <number>', 'Pull request ID')
   .requiredOption('--repo <string>', 'Repository name (e.g., user/repo)')
   .option('--openai-api-key <string>', 'Open AI API key')
@@ -37,7 +42,6 @@ program
       console.log('Analyzing code changes...');
       await codeAnalyzer.addCodeSummary(diff, repo, pullRequestId);
       await codeAnalyzer.analyzeCode(diff, repo, pullRequestId);
-      await codeAnalyzer.addCodeComments(diff, repo, pullRequestId);
     } else {
       console.log("Failed to retrieve changes.");
     }
