@@ -50,7 +50,7 @@ export default class CodeAnalyzer {
       Please create a summary of changes in the form of a table with the columns: File Changes | Summary. 
       File Changes should only include the file name (no full path). 
       For each file changes, provide a summary (up to 3-5 sentences) followed by a detailed bullet point list of the changes.
-      Use bullet points for clarity if you have multiple comments in the Summary column (in collapsible format in next row):
+      Use bullet points for clarity if you have multiple comments in the Summary column:
         \`\`\`markdown
         - Comment 1
         - Comment 2
