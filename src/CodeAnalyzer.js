@@ -64,7 +64,7 @@ export default class CodeAnalyzer {
     const model = 'gpt-4o-mini';
     const temperature = 0.2;
     const response = await this.openAIService.chatCompletion(model, temperature, prompt);
-    await this.githubService.postPullRequestComment(repo, pullRequestId, response);
+    await this.githubService.appendPullRequestDescription(repo, pullRequestId, response);
   }
 
   async addCodeComments(diff, repo, pullRequestId) {
