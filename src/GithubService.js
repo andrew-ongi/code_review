@@ -43,7 +43,7 @@ export default class GitHubService {
         }
     }
 
-    async appendPullRequestDescription(repo, pullNumber, descriptionTpAppend) {
+    async appendPullRequestDescription(repo, pullNumber, descriptionToAppend) {
         try {
             const url = `https://api.github.com/repos/${this.owner}/${repo}/pulls/${pullNumber}`;
             const response = await axios.get(url, {
@@ -56,9 +56,9 @@ export default class GitHubService {
             const existingDescription = response.data.body;
             let newDescription = '';
             if (!existingDescription) {
-                newDescription = `${descriptionTpAppend}`;
-            } else if (!existingDescription.includes(descriptionTpAppend)) {
-                newDescription = `### **Author Notes**\n\n${existingDescription}\n\n---\n${descriptionTpAppend}`;
+                newDescription = `${descriptionToAppend}`;
+            } else if (!existingDescription.includes(descriptionToAppend)) {
+                newDescription = `### **Author Notes**\n\n${existingDescription}\n\n---\n${descriptionToAppend}`;
             }
 
             await axios.patch(
