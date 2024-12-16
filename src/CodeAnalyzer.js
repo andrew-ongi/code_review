@@ -47,7 +47,7 @@ export default class CodeAnalyzer {
 
     async addCodeSummary(diff, repo, pullRequestId) {
         const prompt = `
-      Add a section called "Changes Summary" which contains brief description of the overall changes in bullets, make the sentences very short but easy to understand. 
+      Add a section called "Changes Summary ✨" (with markdown heading H2) which contains brief description of the overall changes in bullets, make the sentences very short but easy to understand. 
       And add another section called "Changes Walkthrough" which contains a changes summary walkthrough in the form of a table with the following columns: **Section** and **Changes Summary**.
       - **Section** column should categorize changes into logical groups like "New DTOs and Validation," "Entity Relationship Updates," "Controller Enhancements," "Service Enhancements," or "Test Updates."
       - **Changes Summary** column contains 2 sections: file and changes
@@ -70,7 +70,13 @@ export default class CodeAnalyzer {
         const model = 'gpt-4o-mini';
         const temperature = 0.2;
         const response = await this.openAIService.chatCompletion(model, temperature, prompt);
-        await this.githubService.appendPullRequestDescription(repo, pullRequestId, response);
+        await this.githubService.appendPullRequestDescription(
+            repo,
+            pullRequestId,
+            response,
+            '<a id="start-of-ai-code-review-result" style="display:none;"></a>',
+            '<a id="end-of-ai-code-review-result" style="display:none;"></a>',
+        );
     }
 
     async addCodeComments(diff, repo, pullRequestId) {

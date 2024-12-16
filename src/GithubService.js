@@ -43,7 +43,7 @@ export default class GitHubService {
         }
     }
 
-    async appendPullRequestDescription(repo, pullNumber, descriptionToAppend) {
+    async appendPullRequestDescription(repo, pullNumber, descriptionTpAppend, startAnchor, endAnchor) {
         try {
             const url = `https://api.github.com/repos/${this.owner}/${repo}/pulls/${pullNumber}`;
             const response = await axios.get(url, {
@@ -54,11 +54,25 @@ export default class GitHubService {
             });
 
             const existingDescription = response.data.body;
+            const authorNotesHeader = '## **Author Notes**';
             let newDescription = '';
             if (!existingDescription) {
-                newDescription = `${descriptionToAppend}`;
-            } else if (!existingDescription.includes(descriptionToAppend)) {
-                newDescription = `### **Author Notes**\n\n${existingDescription}\n\n---\n${descriptionToAppend}`;
+                newDescription = `${startAnchor}\n${descriptionTpAppend}\n${endAnchor}`;
+            } else if (existingDescription.includes(startAnchor)) {
+                // Append the new description after the start anchor and before the end anchor
+                const startIndex = existingDescription.indexOf(startAnchor) + startAnchor.length;
+                const endIndex = existingDescription.indexOf(endAnchor);
+
+                let startExistingDescription = existingDescription.slice(0, startIndex);
+
+                // Add authorNotesHeader if not present
+                if (!startExistingDescription.includes(authorNotesHeader)) {
+                    startExistingDescription = `${authorNotesHeader}\n\n${startExistingDescription}`;
+                }
+
+                newDescription = `${startExistingDescription}\n${descriptionTpAppend}\n${existingDescription.slice(endIndex)}`;
+            } else {
+                newDescription = `${authorNotesHeader}\n\n${existingDescription}\n\n${startAnchor}\n${descriptionTpAppend}\n${endAnchor}`;
             }
 
             await axios.patch(
