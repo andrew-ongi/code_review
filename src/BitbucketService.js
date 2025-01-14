@@ -53,7 +53,7 @@ export default class BitbucketService {
             const authorNotesHeader = '## **Author Notes**';
             let newDescription = '';
             if (!existingDescription) {
-                newDescription = `${startAnchor}\n${descriptionToAppend}\n${endAnchor}`;
+                newDescription = `${startAnchor} \n \n ${descriptionToAppend} \n \n ${endAnchor}`;
             } else if (existingDescription.includes(startAnchor)) {
                 const startIndex = existingDescription.indexOf(startAnchor) + startAnchor.length;
                 const endIndex = existingDescription.indexOf(endAnchor);
@@ -66,7 +66,7 @@ export default class BitbucketService {
 
                 newDescription = `${startExistingDescription}\n${descriptionToAppend}\n${existingDescription.slice(endIndex)}`;
             } else {
-                newDescription = `${authorNotesHeader}\n\n${existingDescription}\n\n${startAnchor}\n${descriptionToAppend}\n${endAnchor}`;
+                newDescription = `${authorNotesHeader} \n\n ${existingDescription}\n\n${startAnchor} \n \n ${descriptionToAppend} \n \n ${endAnchor}`;
             }
 
             await axios.put(
