@@ -20,13 +20,13 @@ export default class CodeAnalyzer {
       - Ignoring unchanged lines of code.
       - Providing feedback in Markdown format, including code snippets and suggestions for improvement.
       - Assigning a score (0-10) based on each category:
-        - **Bugs**: Are there any bugs introduced in the code? Provide details and assign a severity score (0: No bugs, 10: Critical bug).
-        - **Security**: Does the code introduce any security vulnerabilities? Provide details and assign a severity score (0: No issues, 10: High-risk vulnerability).
-        - **Best Practices**: Does the code follow programming best practices? Provide feedback and assign a quality score (0: Follows best practices, 10: Severe deviation).
+        - **Bugs**: Are there any bugs introduced in the code? Provide details and assign a severity score (0: Critical bug, 10: No bugs).
+        - **Security**: Does the code introduce any security vulnerabilities? Provide details and assign a severity score (0: High-risk vulnerability, 10: No issues).
+        - **Best Practices**: Does the code follow programming best practices? Provide feedback and assign a quality score (0: Severe deviation, 10: Follows best practices).
       - Writing 'EMPTY_CODE_REVIEW' if there are no bugs, security issues, or best practice deviations identified.
     
     Provide the feedback and scores in this format:
-    \`\`\`markdown
+    
     ### Code Review Summary
     1. **Function Name / Section**
         - **Bugs**: {bug description} (Score: X/10)
@@ -34,8 +34,8 @@ export default class CodeAnalyzer {
         - **Best Practices**: {feedback} (Score: X/10)
         - **Suggestion**: {suggestion with recommended code snippet}
     
-    Overall Score: {Average score across all categories}
-    \`\`\`
+    Overall Score: {Average score across all categories, in bold}
+    
     
     Here are the code changes:
     ${diff}
@@ -45,79 +45,55 @@ export default class CodeAnalyzer {
     
         // Call GPT to get the review and scores
         const response = await this.openAIService.chatCompletion(model, temperature, prompt);
-    
-        // Parse response and calculate the overall score
-        const parsedResponse = this.parseReviewResponse(response); // Function to parse GPT response
-        const overallScore = this.calculateOverallScore(parsedResponse.scores);
-    
-        // Append review to pull request
-        const reviewSummary = `
-    ---- Code Review ----
-    ${parsedResponse.feedback}
-    **Overall Score**: ${overallScore.toFixed(1)}/10
-    ---- End of Code Review ----
-        `;
-        await this.repoService.postPullRequestComment(repo, pullRequestId, reviewSummary);
+        await this.repoService.postPullRequestComment(repo, pullRequestId, response);
     }
-    
-    // Helper function to parse GPT response and extract scores
-    parseReviewResponse(response) {
-        const feedback = response; // Assuming response already contains Markdown-formatted feedback
-        const scores = [];
-    
-        // Extract scores (you can customize this part to parse structured data from the response)
-        const regex = /\*\*(Bugs|Security|Best Practices)\*\*:.*?Score: (\d+)\/10/g;
-        let match;
-        while ((match = regex.exec(response)) !== null) {
-            scores.push(parseInt(match[2], 10));
-        }
-    
-        return { feedback, scores };
-    }
-    
-    // Helper function to calculate overall score
-    calculateOverallScore(scores) {
-        if (scores.length === 0) return 10; // Default to 10 if no issues found
-        const total = scores.reduce((sum, score) => sum + score, 0);
-        return total / scores.length;
-    }
-  
-  
 
     async addCodeSummary(diff, repo, pullRequestId) {
       const prompt = `
-      Provide a concise summary of the changes in this Merge Request (MR) for easy understanding and documentation. Include the following:
-
-      ### **Summary Requirements:**
-      1. **Changes Summary ✨**:
-        - Briefly list overall changes in bullet points.
-        - Use short, easy-to-understand sentences.
-
-      2. **Changes Walkthrough**:
-        - Present a table with these columns:
-          | **Section**                 | **Changes Summary**                                                                                              |
-          |-----------------------------|------------------------------------------------------------------------------------------------------------------|
-          | **Logical Group (e.g., New DTOs, Validation, etc.)** | [\`<filename>\`](diffhunk://<reference>)<br><ul><li>{change_1}</li><li>{change_2}</li></ul> |
-
-        - For **Section**, categorize changes (e.g., New DTOs and Validation, Controller Enhancements, etc.).
-        - For **Changes Summary**, include:
-          - File name (clickable reference to diff hunk: \`[\`<filename>\`](diffhunk://<reference>)\`).
-          - Brief change descriptions (use terms like "added", "updated", etc.).
-
-      3. Highlight critical changes with emojis for better visibility.
-      4. Ensure descriptions are concise and clear.
-
-      ### Example Table:
-      | **Section**                 | **Changes Summary**                                                                                              |
-      |-----------------------------|------------------------------------------------------------------------------------------------------------------|
-      | **New DTOs and Validation** | [\`user.dto.js\`](diffhunk://src/dtos/user.dto.js)<br><ul><li>Added validation for email</li></ul>               |
-
-      ### Diff:
-      ${diff}}      
+    Add a section called "## Changes Summary ✨" which contains a brief description of the overall changes in bullet points.  
+    Ensure each bullet point appears on a new line and avoid using unsupported formats. Use (\n) as new line separator.
+    
+    Then, add another section called "## Changes Walkthrough" as a simple Markdown table. The table should have the following columns:  
+    
+    | **Section**                 | **Changes Summary**                       |
+    |-----------------------------|-------------------------------------------|
+    | Logical group of changes    | File name and concise change details      |
+    
+    ### Formatting Rules:
+    1. **Changes Summary ✨**: Use \`-\` (dash) for bullet points and ensure line breaks are clear.  
+    2. **Changes Walkthrough**: 
+      - Group changes into categories such as "Controller Enhancements" or "Entity Relationship Updates."
+      - In the **Changes Summary** column:
+        - Start with the file name in bold (e.g., **userController.js**).  
+        - Follow it with a description of changes as bullet points (e.g., \`-\` for each change).  
+    
+    ### Example:
+    
+    ## Changes Summary ✨
+    - Added a login endpoint in the user controller.  
+    - Updated schema for user roles with default values.  
+    
+    ## Changes Walkthrough  
+    
+    | **Section**                 | **Changes Summary**                       |
+    |-----------------------------|-------------------------------------------|
+    | **Controller Enhancements** | **File:** **userController.js**           |
+    |                             |   - Added endpoint for user login.        |
+    |                             |   - Improved error handling for tokens.   |
+    | **Entity Updates**          | **File:** **userModel.js**                |
+    |                             |   - Updated schema for roles.             |
+    |                             |   - Added default value for 'isActive'.   |
+    
+    Ensure the descriptions are concise, precise, and fully compatible with Markdown as supported by Bitbucket. Avoid using unsupported references or HTML tags.  
+    
+    Here are the code changes:  
+    ${diff}
         `;
         const model = 'gpt-4o-mini';
         const temperature = 0.2;
+    
         const response = await this.openAIService.chatCompletion(model, temperature, prompt);
+    
         await this.repoService.appendPullRequestDescription(
             repo,
             pullRequestId,
@@ -125,7 +101,7 @@ export default class CodeAnalyzer {
             '---- Code Review Description ----',
             '---- End of Code Review Description ----',
         );
-    }
+    }  
 
     async addCodeComments(diff, repo, pullRequestId) {
         const prompt = `
