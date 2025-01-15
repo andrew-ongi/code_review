@@ -53,7 +53,7 @@ program
     if (diff) {
       console.log('Analyzing code changes...');
       await codeAnalyzer.addCodeSummary(diff, repo, pullRequestId);
-      // await codeAnalyzer.analyzeCode(diff, repo, pullRequestId);
+      await codeAnalyzer.analyzeCode(diff, repo, pullRequestId);
     } else {
       console.log("Failed to retrieve changes.");
     }
