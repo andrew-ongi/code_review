@@ -19,6 +19,7 @@ export default class CodeAnalyzer {
       - Analyzing only the lines of code that have been added, edited, or deleted in the MR. 
       - Ignoring unchanged lines of code.
       - Providing feedback in Markdown format, including code snippets and suggestions for improvement.
+      - when giving suggestion and the suggestion contain code suggestion, write the suggestion in code snippet. Also provide old code as comparison
       - Assigning a score (0-10) based on each category:
         - **Bugs**: Are there any bugs introduced in the code? Provide details and assign a severity score (0: Critical bug, 10: No bugs).
         - **Security**: Does the code introduce any security vulnerabilities? Provide details and assign a severity score (0: High-risk vulnerability, 10: No issues).
@@ -32,10 +33,20 @@ export default class CodeAnalyzer {
         - **Bugs**: {bug description} (Score: X/10)
         - **Security**: {security issue description} (Score: X/10)
         - **Best Practices**: {feedback} (Score: X/10)
-        - **Suggestion**: {suggestion with recommended code snippet}
+        - **Suggestion**: {short brief of the suggestion} {for code suggestion, write old code and suggestion in code snippet, separated by new line } (Please separate description and code suggestion with new line). for example:        
+          Old Code: 
+
+          \`\`\`javascript
+          constructor(openAIService, repoProvider, githubService, bitbucketService) {
+          \`\`\`
+
+          Suggested Code:
+
+          \`\`\`javascript
+          constructor(openAIService, repositoryProvider, githubService, bitbucketService) { 
+          \`\`\`
     
     Overall Score: {Average score across all categories, in bold}
-    
     
     Here are the code changes:
     ${diff}
