@@ -51,7 +51,7 @@ export default class CodeAnalyzer {
     Here are the code changes:
     ${diff}
         `;
-        const model = 'gpt-o3-mini';
+        const model = 'o3-mini';
         const temperature = 0.3;
     
         // Call GPT to get the review and scores
