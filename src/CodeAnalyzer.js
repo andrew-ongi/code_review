@@ -10,17 +10,17 @@ export default class CodeAnalyzer {
 
     async analyzeCode(diff, repo, pullRequestId) {
       const prompt = `
-    As an AI code reviewer, your role is to analyze the changes in a Merge Request (MR) within a software development project. 
-    You will provide feedback: including potential bugs and critical issues, security and performance issues, and best practices. 
-    You need to consider the overall context of the file changes before conducting a review.
-    The changes in the MR are provided in the standard git diff (unified diff) format. 
+        You are an automated AI code reviewer. Analyze the following git diff from a Merge Request (MR).
+    Focus only on changed lines (added, modified, or deleted) — ignore unchanged lines.
+    Provide structured feedback on potential bugs, security risks, and adherence to best practices.
+    Only use the context available in the diff. Do not assume code outside of it.
     
     Your responsibilities include:          
       - Analyzing only the lines of code that have been added, edited, or deleted in the MR. 
       - Ignoring unchanged lines of code.
       - Providing feedback in Markdown format, including code snippets and suggestions for improvement.
-      - when giving suggestion and the suggestion contain code suggestion, write the suggestion in code snippet. Also provide old code as comparison
-      - Assigning a score (0-10) based on each category:
+      - For suggestions that include code changes, always include both the original (old) and the suggested code in separate code blocks.
+      - Assign a score (0–10) in each category (higher = better quality):
         - **Bugs**: Are there any bugs introduced in the code? Provide details and assign a severity score (0: Critical bug, 10: No bugs).
         - **Security**: Does the code introduce any security vulnerabilities? Provide details and assign a severity score (0: High-risk vulnerability, 10: No issues).
         - **Best Practices**: Does the code follow programming best practices? Provide feedback and assign a quality score (0: Severe deviation, 10: Follows best practices).
@@ -51,7 +51,7 @@ export default class CodeAnalyzer {
     Here are the code changes:
     ${diff}
         `;
-        const model = 'o3-mini';
+        const model = 'gpt-4o-mini';
         const temperature = 0.3;
     
         // Call GPT to get the review and scores
