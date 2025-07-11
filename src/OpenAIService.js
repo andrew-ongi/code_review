@@ -6,16 +6,18 @@ export default class OpenAIService {
   }
 
   async chatCompletion(model, temperature, prompt) {
+    const defaultSystem = 
+    "You are an automated AI code reviewer. Analyze ONLY the provided code diff and user instructions. Do NOT guess, invent, or assume any code outside the given diff or input. " +
+    "Respond strictly according to the format in the user prompt. Output in English.";
+
     try {
       const options = {
         model,
         messages: [
-          { role: "system", content: `You are a highly experienced Technical Lead with the capability to design system architecture. You are a full-stack expert, proficient in backend, web frontend, and mobile development. Your responsibilities include conducting code reviews with a focus on best practices, code standards, security, potential bugs and issues, performance, and compatibility with existing code, while considering the overall context of the code.
-Your backend tech stack includes Golang, Node.js, Java, and PHP. For web frontend, you specialize in Angular, React, and Vue, while for mobile development, you work with both native platforms and Flutter.
-You will always respond in English.`},
-          { role: "user", content: prompt },
+          { role: "system", content: systemMessage || defaultSystem },
+          { role: "user", content: prompt }
         ],
-        temperature,
+        temperature
       };
 
       const response = await this.openai.chat.completions.create(options);

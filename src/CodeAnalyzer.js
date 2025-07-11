@@ -10,46 +10,36 @@ export default class CodeAnalyzer {
 
     async analyzeCode(diff, repo, pullRequestId) {
       const prompt = `
-        You are an automated AI code reviewer. Analyze the following git diff from a Merge Request (MR).
-    Focus only on changed lines (added, modified, or deleted) — ignore unchanged lines.
-    Provide structured feedback on potential bugs, security risks, and adherence to best practices.
-    Only use the context available in the diff. Do not assume code outside of it.
-    
-    Your responsibilities include:          
-      - Analyzing only the lines of code that have been added, edited, or deleted in the MR. 
-      - Ignoring unchanged lines of code.
-      - Providing feedback in Markdown format, including code snippets and suggestions for improvement.
-      - For suggestions that include code changes, always include both the original (old) and the suggested code in separate code blocks.
-      - Assign a score (0–10) in each category (higher = better quality):
-        - **Bugs**: Are there any bugs introduced in the code? Provide details and assign a severity score (0: Critical bug, 10: No bugs).
-        - **Security**: Does the code introduce any security vulnerabilities? Provide details and assign a severity score (0: High-risk vulnerability, 10: No issues).
-        - **Best Practices**: Does the code follow programming best practices? Provide feedback and assign a quality score (0: Severe deviation, 10: Follows best practices).
-      - Writing 'EMPTY_CODE_REVIEW' if there are no bugs, security issues, or best practice deviations identified.
-    
-    Provide the feedback and scores in this format:
-    
-    ### Code Review Summary
-    1. **Function Name / Section**
-        - **Bugs**: {bug description} (Score: X/10)
-        - **Security**: {security issue description} (Score: X/10)
-        - **Best Practices**: {feedback} (Score: X/10)
-        - **Suggestion**: {short brief of the suggestion} {for code suggestion, write old code and suggestion in code snippet, separated by new line } (Please separate description and code suggestion with new line). for example:        
-          Old Code: 
+        You are an automated AI code reviewer. Analyze the following git diff. Only review code changes (ignore unchanged lines and documentation). Strictly do not assume or hallucinate any context outside the diff.
 
-          \`\`\`javascript
-          constructor(openAIService, repoProvider, githubService, bitbucketService) {
-          \`\`\`
+        For each function or section changed:
+        - Identify possible bugs, security risks, and best practice issues (only on changed lines).
+        - For suggestions, provide both the original code ("Old Code") and the suggested code ("Suggested Code") in code blocks.
+        - Give a score 0-10 per category: Bugs, Security, Best Practices (higher = better).
+        - If there are no issues in any category, respond only with: 'EMPTY_CODE_REVIEW'.
 
-          Suggested Code:
+        Use this output format per function/section:
+        ### Code Review Summary
+        1. **Function Name / Section**
+            - **Bugs**: {description} (Score: X/10)
+            - **Security**: {description} (Score: X/10)
+            - **Best Practices**: {description} (Score: X/10)
+            - **Suggestion**:
+              Old Code:
+              \`\`\`javascript (or relevant techstack)
+              // ...
+              \`\`\`
+              Suggested Code:
+              \`\`\`javascript (or relevant techstack)
+              // ...
+              \`\`\`
 
-          \`\`\`javascript
-          constructor(openAIService, repositoryProvider, githubService, bitbucketService) { 
-          \`\`\`
-    
-    Overall Score: {Average score across all categories, in bold}
-    
-    Here are the code changes:
-    ${diff}
+        At the end, output:
+        Overall Score: {AVERAGE (min score across all section/category if any score is 0)}
+
+        Here are the code changes:
+        ${diff}
+
         `;
         const model = 'gpt-4o-mini';
         const temperature = 0.3;
@@ -61,44 +51,44 @@ export default class CodeAnalyzer {
 
     async addCodeSummary(diff, repo, pullRequestId) {
       const prompt = `
-    Add a section called "## Changes Summary ✨" which contains a brief description of the overall changes in bullet points.  
-    Ensure each bullet point appears on a new line and avoid using unsupported formats. Use (\n) as new line separator.
-    
-    Then, add another section called "## Changes Walkthrough" as a simple Markdown table. The table should have the following columns:  
-    
-    | **Section**                 | **Changes Summary**                       |
-    |-----------------------------|-------------------------------------------|
-    | Logical group of changes    | File name and concise change details      |
-    
-    ### Formatting Rules:
-    1. **Changes Summary ✨**: Use \`-\` (dash) for bullet points and ensure line breaks are clear.  
-    2. **Changes Walkthrough**: 
-      - Group changes into categories such as "Controller Enhancements" or "Entity Relationship Updates."
-      - In the **Changes Summary** column:
-        - Start with the file name in bold (e.g., **userController.js**).  
-        - Follow it with a description of changes as bullet points (e.g., \`-\` for each change).  
-    
-    ### Example:
-    
+    Summarize the following git diff into two sections in Markdown for a pull request description.
+
+    **Section 1: "## Changes Summary ✨"**
+    - Write a concise, factual summary of the code changes using '-' (dash) as bullet points.
+    - Each bullet must be on its own line, with no extra spaces or line breaks.
+    - Skip this section if no code changes are present.
+
+    **Section 2: "## Changes Walkthrough"**
+    - Present a Markdown table with these columns: Section | File | Changes Summary
+    - Section: Group the changes logically, e.g., "Controller Updates", "Service Logic", "Entity Changes". If unsure, use the file's main role as section.
+    - File: The filename where changes happened (no bold, no HTML).
+    - Changes Summary: Each bullet (-) is a short, precise line describing a distinct change in that file.
+    - One row per file. If multiple categories in one file, split rows as needed.
+
+    **Formatting Rules:**
+    - Do not use HTML, references, or advanced markdown unsupported in Bitbucket.
+    - Use plain newlines and dashes for bullets, no explicit "\n" in output.
+    - Ignore and do not mention unchanged files or documentation-only changes.
+    - If there are no code changes, respond only with: "NO_CODE_CHANGE".
+
+    **Example:**
+
     ## Changes Summary ✨
-    - Added a login endpoint in the user controller.  
-    - Updated schema for user roles with default values.  
-    
-    ## Changes Walkthrough  
-    
-    | **Section**                 | **Changes Summary**                       |
-    |-----------------------------|-------------------------------------------|
-    | **Controller Enhancements** | **File:** **userController.js**           |
-    |                             |   - Added endpoint for user login.        |
-    |                             |   - Improved error handling for tokens.   |
-    | **Entity Updates**          | **File:** **userModel.js**                |
-    |                             |   - Updated schema for roles.             |
-    |                             |   - Added default value for 'isActive'.   |
-    
-    Ensure the descriptions are concise, precise, and fully compatible with Markdown as supported by Bitbucket. Avoid using unsupported references or HTML tags.  
-    
-    Here are the code changes:  
+    - Added login endpoint to userController.js
+    - Updated role schema in userModel.js
+
+    ## Changes Walkthrough
+
+    | Section             | File             | Changes Summary                     |
+    |---------------------|------------------|-------------------------------------|
+    | Controller Updates  | userController.js| - Added login endpoint              |
+    |                     |                  | - Improved token error handling     |
+    | Entity Updates      | userModel.js     | - Updated role schema               |
+    |                     |                  | - Set default for isActive          |
+
+    Here are the code changes:
     ${diff}
+
         `;
         const model = 'gpt-4o-mini';
         const temperature = 0.2;
