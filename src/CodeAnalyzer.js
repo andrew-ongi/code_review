@@ -41,7 +41,7 @@ export default class CodeAnalyzer {
         ${diff}
 
         `;
-        const model = 'gpt-4o-mini';
+        const model = 'gpt-4.1-mini';
         const temperature = 0.3;
     
         // Call GPT to get the review and scores
@@ -90,7 +90,7 @@ export default class CodeAnalyzer {
     ${diff}
 
         `;
-        const model = 'gpt-4o-mini';
+        const model = 'gpt-4.1-nano';
         const temperature = 0.2;
     
         const response = await this.openAIService.chatCompletion(model, temperature, prompt);
