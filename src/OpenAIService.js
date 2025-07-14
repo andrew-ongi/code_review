@@ -14,7 +14,7 @@ export default class OpenAIService {
       const options = {
         model,
         messages: [
-          { role: "system", content: systemMessage || defaultSystem },
+          { role: "system", content: defaultSystem },
           { role: "user", content: prompt }
         ],
         temperature
