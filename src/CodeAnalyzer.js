@@ -21,15 +21,19 @@ export default class CodeAnalyzer {
         Use this output format per function/section:
         ### Code Review Summary
         1. **Function Name / Section**
-            - **Bugs**: {description} (Score: X/10)
-            - **Security**: {description} (Score: X/10)
-            - **Best Practices**: {description} (Score: X/10)
+            
+            - **Bugs**: {description} (Score: X/10) \n
+            
+            - **Security**: {description} (Score: X/10) \n
+            
+            - **Best Practices**: {description} (Score: X/10) \n
+            
             - **Suggestion**:
-              Old Code:
+              \nOld Code:
               \`\`\`javascript (or relevant techstack)
               // ...
               \`\`\`
-              Suggested Code:
+              \nSuggested Code:
               \`\`\`javascript (or relevant techstack)
               // ...
               \`\`\`
@@ -79,12 +83,15 @@ export default class CodeAnalyzer {
 
     ## Changes Walkthrough
 
+
     | Section             | File             | Changes Summary                     |
     |---------------------|------------------|-------------------------------------|
     | Controller Updates  | userController.js| - Added login endpoint              |
     |                     |                  | - Improved token error handling     |
     | Entity Updates      | userModel.js     | - Updated role schema               |
     |                     |                  | - Set default for isActive          |
+    \n\n
+
 
     Here are the code changes:
     ${diff}
@@ -94,7 +101,7 @@ export default class CodeAnalyzer {
         const temperature = 0.2;
     
         const response = await this.openAIService.chatCompletion(model, temperature, prompt);
-    
+        
         await this.repoService.appendPullRequestDescription(
             repo,
             pullRequestId,
