@@ -78,8 +78,10 @@ export default class CodeAnalyzer {
     **Example:**
 
     ## Changes Summary ✨
-    - Added login endpoint to userController.js
-    - Updated role schema in userModel.js
+    
+      - Added login endpoint to userController.js \n
+    
+      - Updated role schema in userModel.js \n
 
     ## Changes Walkthrough
 
@@ -90,6 +92,7 @@ export default class CodeAnalyzer {
     |                     |                  | - Improved token error handling     |
     | Entity Updates      | userModel.js     | - Updated role schema               |
     |                     |                  | - Set default for isActive          |
+    
     \n\n
 
 
@@ -106,8 +109,16 @@ export default class CodeAnalyzer {
             repo,
             pullRequestId,
             response,
-            '---- Code Review Description ----',
-            '---- End of Code Review Description ----',
+            `
+            
+            ---- Code Review Description ----
+            
+            `,
+            `
+            
+            ---- End of Code Review Description ----
+            
+            `,
         );
     }  
 
